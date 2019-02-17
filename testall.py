@@ -32,11 +32,6 @@ try:
         fileinput = browser.find_element_by_id('filePicker')
         fileinput.send_keys(str(currentFile))
 
-        # wait for the pop-up
-        # element = WebDriverWait(browser, 10).until(
-        #     EC.visibility_of_element_located((By.XPATH, "/html/body/div[3]"))
-        # )
-
         time.sleep(5)
 
         # click first submit button
