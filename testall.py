@@ -38,11 +38,13 @@ try:
         submit_button = browser.find_elements_by_xpath('/html/body/div[3]/div[7]/div/button')[0]
         submit_button.click()
 
+        time.sleep(5)
+
         # click second submit button
         submit_button = browser.find_elements_by_xpath('/html/body/div[3]/div[7]/div/button')[0]
         submit_button.click()
 
-        time.sleep(3)
+        time.sleep(5)
 
          # start the evaluation run
         eval_button = browser.find_elements_by_xpath('//*[@id="evalButton"]')[0]
