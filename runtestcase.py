@@ -25,7 +25,14 @@ testedFolderName = ''
 currentPattern = "*.js"
 
 # setup browser 
-browser=webdriver.Chrome()
+chromeOptions = webdriver.ChromeOptions()
+chromeOptions.add_experimental_option("prefs", {
+  "download.prompt_for_download": False,
+  "download.directory_upgrade": True,
+  "safebrowsing.enabled": False
+})
+
+browser=webdriver.Chrome(chrome_options=chromeOptions)
 browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
 
 # run test cases -------------------------------------------------------------------------------------------
