@@ -25,23 +25,28 @@ testedFolderName = ''
 currentPattern = "*.js"
 
 # setup browser 
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
 chromeOptions = webdriver.ChromeOptions()
 chromeOptions.add_experimental_option("prefs", {
   "download.prompt_for_download": False,
   "download.directory_upgrade": True,
-  "safebrowsing.enabled": False
+  "safebrowsing.enabled": True,
+  "profile.default_content_setting_values.automatic_downloads": 1
 })
-
-browser=webdriver.Chrome(chrome_options=chromeOptions)
-browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
+chromeOptions.add_argument(f'user-agent={user_agent}')
 
 # run test cases -------------------------------------------------------------------------------------------
 try:
-    element = WebDriverWait(browser, 10).until(
-        EC.presence_of_element_located((By.ID, "filePicker"))
-    )
-
+# Start running test cases
     for currentTestCase in testDirectory.glob(currentPattern):
+        # Load up the browser each time to minimize memory leak issues
+        print('Loading browser...')
+        browser=webdriver.Chrome(options=chromeOptions)
+        browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
+
+        element = WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.ID, "filePicker"))
+        )
 
         # create folder for this test case's results
         timestr = time.strftime("%Y%m%d-%H%M%S")
@@ -75,9 +80,8 @@ try:
 
         # wait until the test case training ends
         element = WebDriverWait(browser, 14420).until(
-            EC.text_to_be_present_in_element((By.XPATH, "/html/body/div[3]/h2"),'Training finished!')
+            EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[7]/div/button"))
         )
-
 
         time.sleep(5)
 
@@ -137,10 +141,11 @@ try:
 
         finally:
             print('Evaluation Run Completed!')
+    
+        browser.quit()
 
 finally:
     print('Test case runs completed!')
-    browser.quit()
 
 
 
