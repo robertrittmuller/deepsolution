@@ -34,14 +34,33 @@ chromeOptions.add_experimental_option("prefs", {
   "profile.default_content_setting_values.automatic_downloads": 1
 })
 chromeOptions.add_argument(f'user-agent={user_agent}')
+chromeOptions.add_argument('headless')
 
 # run test cases -------------------------------------------------------------------------------------------
 try:
 # Start running test cases
     for currentTestCase in testDirectory.glob(currentPattern):
         # Load up the browser each time to minimize memory leak issues
-        print('Loading browser...')
+        print('Starting test case...')
         browser=webdriver.Chrome(options=chromeOptions)
+
+        # Just in case we are running in headless mode set up file downloads
+        browser.command_executor._commands["send_command"] = (
+            "POST",
+            '/session/$sessionId/chromium/send_command'
+        )
+        params = {
+            'cmd': 'Page.setDownloadBehavior',
+            'params': {
+                'behavior': 'allow',
+                'downloadPath': str(downloadDirectory)
+            }
+        }
+        browser.execute("send_command", params)
+
+        time.sleep(5)
+
+        # Load up DeepTraffic
         browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
 
         element = WebDriverWait(browser, 10).until(
@@ -53,6 +72,7 @@ try:
         currentFileName = currentTestCase.stem
         rootFileName = os.path.splitext(currentFileName)[0]
         testedFolderName = rootFileName + '_' + timestr
+        print('Working on test case ' + str(testedFolderName))
         resultsDirectory = testedDirectory.joinpath(str(testedFolderName))
         resultsDirectory.mkdir()
 

@@ -1,4 +1,5 @@
 chromedriver.exe
 debug.log
 settings.json
+*.bat
 .vscode/settings.json
