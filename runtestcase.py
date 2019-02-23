@@ -99,9 +99,15 @@ try:
         eval_button.click()
 
         # wait until the test case training ends
-        element = WebDriverWait(browser, 14420).until(
-            EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[7]/div/button"))
-        )
+        try:
+            element = WebDriverWait(browser, 14420).until(
+                EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[7]/div/button"))
+            )
+        except:
+            # this is to trap a strange error where the element is not found but an exception is still triggered.
+            element = WebDriverWait(browser, 14420).until(
+                EC.element_to_be_clickable((By.XPATH, "/html/body/div[3]/div[7]/div/button"))
+            )
 
         time.sleep(5)
 
