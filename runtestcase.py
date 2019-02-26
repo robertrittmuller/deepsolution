@@ -44,6 +44,7 @@ try:
         # Load up the browser each time to minimize memory leak issues
         print('Starting test case...')
         browser=webdriver.Chrome(options=chromeOptions)
+        browser.implicitly_wait(0)
 
         # Just in case we are running in headless mode set up file downloads
         browser.command_executor._commands["send_command"] = (
