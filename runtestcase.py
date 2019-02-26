@@ -152,7 +152,14 @@ try:
 
                 # grab the score
                 element=browser.find_element_by_xpath('/html/body/div[3]/p/b')
-                ext = '_' + element.text[0:5] + '.js'
+                score = element.text
+                score = score.replace("mph", "")
+                score = score.replace(" ", "")
+                if(float(score) >= 76):
+                    ext = '_' + score + '_FTW.js'
+                else:
+                     ext = '_' + score + '.js'
+
                 new_file_name = str(currentFile).replace('.js', str(ext))
                 os.rename(currentFile, new_file_name)
                 shutil.move(new_file_name, resultsDirectory)
