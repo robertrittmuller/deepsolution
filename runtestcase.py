@@ -42,7 +42,7 @@ def startBrowser():
 
     # create new browser instance
     browser=webdriver.Chrome(options=chromeOptions)
-    browser.implicitly_wait(0)
+    browser.implicitly_wait(60)
 
     # Just in case we are running in headless mode set up file downloads
     browser.command_executor._commands["send_command"] = (
@@ -58,6 +58,9 @@ def startBrowser():
     }
     browser.execute("send_command", params)
 
+    # Load up DeepTraffic
+    browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
+
     return browser
 
 def runTestCase(currentTestCase):
@@ -66,21 +69,9 @@ def runTestCase(currentTestCase):
 
     time.sleep(5)
 
-    # Load up DeepTraffic
-    browser.get('https://selfdrivingcars.mit.edu/deeptraffic/')
-
     element = WebDriverWait(browser, 10).until(
         EC.presence_of_element_located((By.ID, "filePicker"))
     )
-
-    # create folder for this test case's results
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    currentFileName = currentTestCase.stem
-    rootFileName = os.path.splitext(currentFileName)[0]
-    testedFolderName = rootFileName + '_' + timestr
-    print('Working on test case ' + str(testedFolderName))
-    resultsDirectory = testedDirectory.joinpath(str(testedFolderName))
-    resultsDirectory.mkdir()
 
     # Upload the test case
     fileinput = browser.find_element_by_id('filePicker')
@@ -104,6 +95,9 @@ def runTestCase(currentTestCase):
     eval_button = browser.find_elements_by_xpath('//*[@id="trainButton"]')[0]
     eval_button.click()
 
+    # WebDriverWait(browser, 14400).until(
+    #     EC.text_to_be_present_in_element((By.ID, 'trainProgress'), "100"))
+
     # wait until the test case training ends
     while True:
         try:
@@ -121,10 +115,9 @@ def runTestCase(currentTestCase):
 
     time.sleep(5)
 
-    # clean up after everything is done!
-    browser.quit()
-
 def testResult(currentFile):
+
+    time.sleep(5)
 
     # make sure we see a filepicker before attempting anything...
     element = WebDriverWait(browser, 10).until(
@@ -159,19 +152,19 @@ def testResult(currentFile):
     )
 
     # grab the score
-    element=browser.find_element_by_xpath('/html/body/div[3]/p/b')
+    element = browser.find_element_by_xpath('/html/body/div[3]/p/b')
     score = element.text
     score = score.replace("mph", "")
     score = score.replace(" ", "")
     if(float(score) >= 76):
         ext = '_' + score + '_FTW.js'
     else:
-            ext = '_' + score + '.js'
+        ext = '_' + score + '.js'
 
     new_file_name = str(currentFile).replace('.js', str(ext))
     os.rename(currentFile, new_file_name)
     shutil.move(new_file_name, resultsDirectory)
-    print('Processed - ' + str(currentFile) + ' with a score of ' + element.text[0:5])
+    print('Processed - ' + str(currentFile) + ' with a score of ' + score)
 
     # click last submit button
     submit_button = browser.find_elements_by_xpath('/html/body/div[3]/div[7]/div/button')[0]
@@ -183,8 +176,18 @@ def testResult(currentFile):
 browser = startBrowser()
 for currentTestCase in testDirectory.glob(currentPattern):
     runTestCase(currentTestCase)
+
+     # create folder for this test case's results
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    currentFileName = currentTestCase.stem
+    rootFileName = os.path.splitext(currentFileName)[0]
+    testedFolderName = rootFileName + '_' + timestr
+    print('Completed test case ' + str(testedFolderName))
+    resultsDirectory = testedDirectory.joinpath(str(testedFolderName))
+    resultsDirectory.mkdir()
+
     # start processing the test case outputs -------------------------------------------------------------------
-    browser.refresh
+    browser.refresh()
     for currentFile in downloadDirectory.glob(currentPattern):  
         testResult(currentFile)
 
