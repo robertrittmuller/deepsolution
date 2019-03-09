@@ -42,7 +42,7 @@ def startBrowser():
 
     # create new browser instance
     browser=webdriver.Chrome(options=chromeOptions)
-    browser.implicitly_wait(60)
+    browser.implicitly_wait(120)
 
     # Just in case we are running in headless mode set up file downloads
     browser.command_executor._commands["send_command"] = (
@@ -105,6 +105,8 @@ def runTestCase(currentTestCase):
             if popup.is_displayed():
                 break
         except NoSuchElementException:
+            continue
+        except TimeoutError:
             continue
 
     time.sleep(5)
