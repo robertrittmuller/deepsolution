@@ -38,6 +38,7 @@ checkpointPattern = "*.js"
 # let's create a file to dump our data to
 outputfile = open(outputPath, "w")
 outputfile.write("Date/Time, Generation, Version, Epoc, Single Car Score, Multi-Car Score, lanesSide, patchesAhead, patchesBehind, trainIterations, opt.gamma, opt.epsilon_min, opt.experience_size, learning_rate, momentum, batch_size, l2_decay")
+outputfile.write('\n')
 
 # loop through all the folders to locate each data run's files
 for currentDirectory in dataPath.glob(currentPattern):
