@@ -4,6 +4,7 @@ import pathlib
 import os
 import os.path
 import shutil
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,7 +13,10 @@ from selenium.webdriver.support import expected_conditions as EC
 # get a list of files to process using the passed path
 args = sys.argv[1:]
 testpath = args[0]
-testedpath = args[1]
+testedpath = pathlib.Path(args[1])
+
+# set the timestamp for the results folder
+timestr = time.strftime("%Y%m%d-%H%M%S")
 
 # define the path
 currentDirectory = pathlib.Path(testpath)
@@ -38,6 +42,16 @@ try:
         EC.presence_of_element_located((By.ID, "filePicker"))
     )
     for currentFile in currentDirectory.glob(currentPattern):  
+        # create folder for this test case's results
+        fileNameComponents = str(currentFile).split("-")
+        currentFileName = fileNameComponents[0] + "-" + fileNameComponents[1] + "-" + fileNameComponents[2]
+        # rootFileName = os.path.splitext(currentFileName)[0]
+        path, rootFileName = os.path.split(currentFileName)
+        testedFolderName = rootFileName + '_' + timestr
+        resultsDirectory = testedpath.joinpath(str(testedFolderName))
+        if not (os.path.isdir(resultsDirectory)):
+            print('Creating new folder ' + str(resultsDirectory))
+            resultsDirectory.mkdir()
 
         # Upload the file to test
         fileinput = browser.find_element_by_id('filePicker')
@@ -78,7 +92,7 @@ try:
             
         new_file_name = str(currentFile).replace('.js', str(ext))
         os.rename(currentFile, new_file_name)
-        shutil.move(new_file_name, testedpath)
+        shutil.move(new_file_name, resultsDirectory)
         print('Processed - ' + str(currentFile) + ' with a score of ' + element.text[0:5])
 
          # click last submit button
