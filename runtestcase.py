@@ -26,6 +26,9 @@ resultsDirectory = ''
 # define the pattern to use for finding files in the download directory
 currentPattern = "*.js"
 
+# setup timestamp for target folder name
+timestr = time.strftime("%Y%m%d-%H%M%S")
+
 def startBrowser():
     # setup the browser instance and return it
     # setup browser 
@@ -118,7 +121,7 @@ def runTestCase(currentTestCase):
     time.sleep(5)
 
 def testResult(currentFile):
-
+    
     time.sleep(5)
 
     # make sure we see a filepicker before attempting anything...
@@ -179,18 +182,20 @@ browser = startBrowser()
 for currentTestCase in testDirectory.glob(currentPattern):
     runTestCase(currentTestCase)
 
-     # create folder for this test case's results
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    currentFileName = currentTestCase.stem
-    rootFileName = os.path.splitext(currentFileName)[0]
-    testedFolderName = rootFileName + '_' + timestr
-    print('Completed test case ' + str(testedFolderName))
-    resultsDirectory = testedDirectory.joinpath(str(testedFolderName))
-    resultsDirectory.mkdir()
-
     # start processing the test case outputs -------------------------------------------------------------------
     browser.refresh()
     for currentFile in downloadDirectory.glob(currentPattern):  
+
+        # create folder for this test case's results
+        fileNameComponents = str(currentFile).split("-")
+        currentFileName = fileNameComponents[0] + "-" + fileNameComponents[1] + "-" + fileNameComponents[2]
+        path, rootFileName = os.path.split(currentFileName)
+        testedFolderName = rootFileName + '_' + timestr
+        resultsDirectory = testedDirectory.joinpath(str(testedFolderName))
+        if not (os.path.isdir(resultsDirectory)):
+            print('Creating new folder ' + str(resultsDirectory))
+            resultsDirectory.mkdir()
+
         testResult(currentFile)
 
 # Now our watch has ended
