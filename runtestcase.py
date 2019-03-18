@@ -104,6 +104,7 @@ def runTestCase(currentTestCase):
         try:
             popup = browser.find_element_by_xpath("/html/body/div[3]")
             if popup.is_displayed():
+                browserHasCrashed = False
                 break
         except NoSuchElementException:
             browserHasCrashed = True
