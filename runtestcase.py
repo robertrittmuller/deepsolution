@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 
 # get a list of files to process using the passed path
 args = sys.argv[1:]
@@ -26,8 +27,8 @@ resultsDirectory = ''
 # define the pattern to use for finding files in the download directory
 currentPattern = "*.js"
 
-# setup timestamp for target folder name
-timestr = time.strftime("%Y%m%d-%H%M%S")
+# We need to track if the browser has crashed so we can clean up gracefully
+browserHasCrashed = False
 
 def startBrowser():
     # setup the browser instance and return it
@@ -98,9 +99,6 @@ def runTestCase(currentTestCase):
     eval_button = browser.find_elements_by_xpath('//*[@id="trainButton"]')[0]
     eval_button.click()
 
-    # WebDriverWait(browser, 14400).until(
-    #     EC.text_to_be_present_in_element((By.ID, 'trainProgress'), "100"))
-
     # wait until the test case training ends
     while True:
         try:
@@ -108,15 +106,18 @@ def runTestCase(currentTestCase):
             if popup.is_displayed():
                 break
         except NoSuchElementException:
+            browserHasCrashed = True
             continue
-        except TimeoutError:
-            continue
+        except TimeoutException:
+            browserHasCrashed = True
+            break
 
     time.sleep(5)
 
-    # click last submit button
-    submit_button = browser.find_elements_by_xpath('/html/body/div[3]/div[7]/div/button')[0]
-    submit_button.click()
+    # click last submit button but only if the browser is still running.
+    if(browserHasCrashed == False):
+        submit_button = browser.find_elements_by_xpath('/html/body/div[3]/div[7]/div/button')[0]
+        submit_button.click()
 
     time.sleep(5)
 
@@ -182,8 +183,13 @@ browser = startBrowser()
 for currentTestCase in testDirectory.glob(currentPattern):
     runTestCase(currentTestCase)
 
+    # setup timestamp for target folder name
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+
     # start processing the test case outputs -------------------------------------------------------------------
-    browser.refresh()
+    browser.quit()
+    browser = startBrowser()
+    
     for currentFile in downloadDirectory.glob(currentPattern):  
 
         # create folder for this test case's results
