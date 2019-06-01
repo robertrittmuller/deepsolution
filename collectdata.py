@@ -33,7 +33,7 @@ outputPath = pathlib.Path(args[1])
 
 # define the pattern for the folder strucutre that contains the data
 currentPattern = "net*"
-checkpointPattern = "*.js"
+checkpointPattern = "net*.js"
 
 # let's create a file to dump our data to
 outputfile = open(outputPath, "w")

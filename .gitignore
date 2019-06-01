@@ -3,3 +3,5 @@ debug.log
 settings.json
 *.bat
 .vscode/settings.json
+*.csv
+*.vscode
