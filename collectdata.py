@@ -37,8 +37,11 @@ checkpointPattern = "net*.js"
 
 # let's create a file to dump our data to
 outputfile = open(outputPath, "w")
-outputfile.write("Date/Time, Generation, Version, Epoc, Single Car Score, Multi-Car Score, lanesSide, patchesAhead, patchesBehind, trainIterations, opt.gamma, opt.epsilon_min, opt.experience_size, learning_rate, momentum, batch_size, l2_decay")
+outputfile.write("RowID, Date/Time, Generation, Version, Epoc, Single Car Score, Multi-Car Score, lanesSide, patchesAhead, patchesBehind, trainIterations, opt.gamma, opt.epsilon_min, opt.experience_size, learning_rate, momentum, batch_size, l2_decay")
 outputfile.write('\n')
+
+# need to define a unique key for each line
+lineCount = 0
 
 # loop through all the folders to locate each data run's files
 for currentDirectory in dataPath.glob(currentPattern):
@@ -85,12 +88,13 @@ for currentDirectory in dataPath.glob(currentPattern):
         checkpoint_l2_decay = extract_parameter(checkpointFile, "l2_decay:")
 
         # output the full data set to a file
-        outputfile.write(runDateTime + "," + runGeneration + "," + runVersion + "," + checkpointEpoc + "," \
+        outputfile.write(str(lineCount) + "," + runDateTime + "," + runGeneration + "," + runVersion + "," + checkpointEpoc + "," \
             + checkpointSingleScore + "," + checkpointMultipleScore + "," + checkpoint_LanesSide + "," + checkpoint_patchesAhead \
                 + "," + checkpoint_patchesBehind + "," + checkpoint_trainIterations + "," + checkpoint_optgamma \
                     + "," + checkpoint_optepsilon + "," + checkpoint_optexperiance_size + "," + checkpoint_learning_rate \
                         + "," + checkpoint_momentum + "," + checkpoint_batch_size + "," + checkpoint_l2_decay)
         outputfile.write('\n')
+        lineCount = lineCount + 1
 
 # close out the file gracefully
 outputfile.close()
