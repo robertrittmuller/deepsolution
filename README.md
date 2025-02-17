@@ -34,6 +34,79 @@ This Python script is responsible for automating the data extraction and analysi
 
 At the core of DeepTraffic solution is a deep Q-learning algorithm that approximates the optimal Q-function for navigating dense traffic, DeepSolution automates the process of hyperparameter discovery and enabled easy testing of various model architectures. During testing the DeepTraffic agent receives a state representation (for example, an occupancy grid from the simulation) and uses the neural network model—trained via temporal difference updates—to decide among a set of possible actions (such as accelerating or changing lanes). The collectdata.py script gathers experiential data from these interactions, which can be used to refine the model hyperparameters and architecture further. Together, these components form a cohesive system for developing, testing, and iterating on a deep reinforcement learning solution aimed at winning the DeepTraffic challenge.
 
+### Winning Network (Architecture / Hyperparameters)
+This network produced a top score of <b>76.17</b> which completely destroyed the nearest MIT student's score and effectively closed-the-deal for keeping me on the leaderboard well past the end of the formal competition. 
+
+* <i>NOTE: The screen shot above was taken prior to this score being submitted and I totally forgot to take an updated one after submitting. :-(</i>
+
+```JavaScript
+// a few things don't have var in front of them - they update already existing variables the game needs
+lanesSide = 6;
+patchesAhead = 30;
+patchesBehind = 10;
+trainIterations = 130000;
+
+// the number of other autonomous vehicles controlled by your network
+otherAgents = 10; // max of 10
+
+var num_inputs = (lanesSide * 2 + 1) * (patchesAhead + patchesBehind);
+var num_actions = 5;
+var temporal_window = 0;
+var network_size = num_inputs * temporal_window + num_actions * temporal_window + num_inputs;
+
+var layer_defs = [];
+    layer_defs.push({
+    type: 'input',
+    out_sx: 1,
+    out_sy: 1,
+    out_depth: network_size
+});
+layer_defs.push({
+    type: 'fc',
+    num_neurons: 32,
+    activation: 'tanh'
+});
+layer_defs.push({
+    type: 'fc',
+    num_neurons: 16,
+    activation: 'tanh'
+});
+layer_defs.push({
+    type: 'fc',
+    num_neurons: 16,
+    activation: 'tanh'
+});
+layer_defs.push({
+    type: 'fc',
+    num_neurons: 32,
+    activation: 'tanh'
+});
+layer_defs.push({
+    type: 'regression',
+    num_neurons: num_actions
+});
+
+var tdtrainer_options = {
+    learning_rate: 0.01,
+    momentum: 0.001,
+    batch_size: 192,
+    l2_decay: 0.01
+};
+
+var opt = {};
+opt.temporal_window = temporal_window;
+opt.experience_size = 30000;
+opt.start_learn_threshold = 500;
+opt.gamma = 0.98;
+opt.learning_steps_total = 150000;
+opt.learning_steps_burnin = 500;
+opt.epsilon_min = 0.01;
+opt.epsilon_test_time = 0.001;
+opt.layer_defs = layer_defs;
+opt.tdtrainer_options = tdtrainer_options;
+```
+### Citation
+
 ```
 @misc{rittmuller2019deepsolution,
   author = {Rittmuller, Robert},
