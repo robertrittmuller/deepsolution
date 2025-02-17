@@ -1,5 +1,5 @@
 # DeepSolution
-The ultimate answer to the DeepTraffic MIT reinforcement learning competition!
+The ultimate answer to the MIT DeepTraffic reinforcement learning competition!
 
 <img src="images/DeepTraffic-Leaderboard.png">
 
