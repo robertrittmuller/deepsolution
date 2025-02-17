@@ -37,7 +37,7 @@ At the core of DeepTraffic solution is a deep Q-learning algorithm that approxim
 ```
 @misc{rittmuller2019deepsolution,
   author = {Rittmuller, Robert},
-  title = {DeepSolution: The Ultimate Answer to the DeepTraffic MIT Reinforcement Learning Competition},
+  title = {DeepSolution: The Ultimate Answer to the MIT DeepTraffic Reinforcement Learning Competition},
   year = {2019},
   publisher = {GitHub},
   howpublished = {\url{https://github.com/robertrittmuller/deepsolution}},
