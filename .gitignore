@@ -5,3 +5,4 @@ settings.json
 .vscode/settings.json
 *.csv
 *.vscode
+.DS_Store
